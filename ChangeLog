@@ -1,0 +1,19 @@
+20090509
+	- (alonbl) Fixup dash issues.
+	- (aonbl) Release 0.5
+
+20070519
+	- (alonbl) Switch diff arguments.
+	- (alonbl) Release 0.4
+
+20060918
+	- (alonbl) Sort file list before digest to support tmpfs,
+	  thanks to Raimar Sandner <mail@404not-found.de>
+	- (alonbl) Release 0.3
+
+20060426
+	- (alonbl) Added mount boot partition by Pat Double
+	- (alonbl) Release 0.2
+
+20060101
+	- (alonbl) Release 0.1

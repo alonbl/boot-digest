@@ -1,0 +1,46 @@
+#/bin/sh
+
+bootdir=/boot
+persist=/var/lib/boot-digest
+base=`dirname $0`
+mytemp=/tmp/boot.digest.$$
+boot_mounted=0
+myreturn=0
+
+if mount | grep "${bootdir}" > /dev/null; then
+	boot_mounted=1
+fi
+
+if [ "${boot_mounted}" = 0 ]; then
+	if ! mount -o ro "${bootdir}"; then
+		echo "Cannot mount boot parition ${bootdir}" >&2
+		echo "Bad boot digest!!! Cannot mount boot parition ${bootdir}" | wall
+		exit 1
+	fi
+fi
+
+mkdir "${mytemp}"
+"${base}/boot-digest-calc" "${mytemp}"
+
+last=`pwd`
+cd "${mytemp}"
+
+for f in *.digest; do
+	out=`diff -uNpr "${persist}/${f}" "${f}" 2>&1`
+	if [ $? != 0 ]; then
+		myreturn=1
+		wall <<__EOF__
+Bad boot digest!!! (${f})
+${out}
+__EOF__
+	fi
+done
+
+cd /
+rm -fr "${mytemp}"
+
+if [ "${boot_mounted}" = 0 ]; then
+	umount "${bootdir}"
+fi
+
+exit ${myreturn}

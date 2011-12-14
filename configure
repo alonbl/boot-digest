@@ -1,0 +1,42 @@
+#!/bin/sh
+
+cd `dirname "$0"`
+
+USAGE=0
+PREFIX=/usr
+LOCALSTATEDIR=/var/lib
+DIGEST=SHA1
+
+for p in $*; do
+	v=${p#*=}
+	case "$p" in
+		--help)
+			USAGE=1
+		;;
+		--prefix=*)
+			PREFIX="$v"
+		;;
+		--localstatedir=*)
+			LOCALSTATEDIR="$v"
+		;;
+		--digest=*)
+			DIGEST="$v";
+		;;
+	esac
+done
+
+if [ ${USAGE} != 0 ]; then
+	echo -e "usage $0"
+	echo -e "\t--help\t\t\tThis help."
+	echo -e "\t--prefix=dir\t\tSet installation prefix, default /usr."
+	echo -e "\t--localstatedir=dir\tSet state directory, default /var/lib."
+	echo -e "\t--digest=digest\t\tSet digest algorithm, default SHA1."
+	echo -e "\t\t\t\tThis digest is passed as argument to perl Digest->new."
+	exit 1
+fi
+
+echo "PREFIX=${PREFIX}" > Makefile.inc
+echo "LOCALSTATEDIR=${LOCALSTATEDIR}" >> Makefile.inc
+echo "DIGEST=${DIGEST}" >> Makefile.inc
+
+exit 0

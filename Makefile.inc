@@ -1,0 +1,3 @@
+PREFIX=/usr
+LOCALSTATEDIR=/var/lib
+DIGEST=SHA1

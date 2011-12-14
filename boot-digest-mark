@@ -1,0 +1,13 @@
+#/bin/sh
+
+echo "Marking boot digest!!!" | wall
+
+persist=/var/lib/boot-digest
+base=`dirname "$0"`
+
+if ! [ -d "${persist}" ]; then
+	mkdir -p "${persist}"
+fi
+
+"${base}/boot-digest-calc" "${persist}"
+

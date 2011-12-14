@@ -1,0 +1,90 @@
+#!/usr/bin/perl
+
+use strict;
+use Digest;
+
+main (@ARGV);
+
+sub main {
+	my (
+		$algo,
+		$dir
+	) = @_;
+
+	if ($dir eq "") {
+		printf STDERR ("usage: %s hash directory\n", $0);
+		exit (1);
+	}
+
+	my @r = DigestDir ($algo, $dir);
+
+	for my $x (@r) {
+		printf ("%s\t%s\t%s\n", $x->{'Type'}, $x->{'File'}, $x->{'Digest'});
+	}
+
+	exit (0);
+}
+
+sub DigestDir {
+	my (
+		$algo,
+		$dir
+	) = @_;
+
+	my @ret;
+
+	opendir (DIR, $dir);
+	my @contents = sort (readdir (DIR));
+	closedir (DIR);
+
+	for my $x (@contents) {
+		if ($x ne "." && $x ne "..") {
+			my $fqn = sprintf ("%s/%s", $dir, $x);
+
+			if (-l $fqn) {
+				my $to = readlink ($fqn);
+				
+				push (
+					@ret,
+					{
+						'File'		=> $fqn,
+						'Type'		=> "LINK",
+						'Digest'	=> $to
+					}
+				);
+			}
+			elsif (-d $fqn) {
+				push (
+					@ret,
+					{
+						'File'		=> $fqn,
+						'Type'		=> "DIR",
+						'Digest'	=> ""
+					}
+				);
+
+				push (
+					@ret,
+					DigestDir ($algo, $fqn)
+				);
+			}
+			else {
+				my $d = Digest->new ($algo);
+				open (my $F, "< $fqn");
+				$d->addfile ($F);
+				close ($F);
+
+				push (
+					@ret,
+					{
+						'File'		=> $fqn,
+						'Type'		=> "FILE",
+						'Digest'	=> $d->b64digest
+					}
+				);
+			}
+		}
+	}
+
+	return @ret;
+}

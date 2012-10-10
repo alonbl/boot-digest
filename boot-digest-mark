@@ -9,5 +9,5 @@ if ! [ -d "${persist}" ]; then
 	mkdir -p "${persist}"
 fi
 
-"${base}/boot-digest-calc" "${persist}"
+"${base}/boot-digest-calc" > "${persist}/digest"
 

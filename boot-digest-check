@@ -1,11 +1,16 @@
-#/bin/sh
+#!/bin/sh
 
 bootdir=/boot
 persist=/var/lib/boot-digest
 base=`dirname $0`
 mytemp=/tmp/boot.digest.$$
 boot_mounted=0
-myreturn=0
+myreturn=1
+
+cleanup() {
+	rm -fr "${mytemp}"
+}
+trap cleanup 0
 
 if mount | grep "${bootdir}" > /dev/null; then
 	boot_mounted=1
@@ -19,28 +24,19 @@ if [ "${boot_mounted}" = 0 ]; then
 	fi
 fi
 
-mkdir "${mytemp}"
-"${base}/boot-digest-calc" "${mytemp}"
+mkdir -p "${mytemp}"
+"${base}/boot-digest-calc" > "${mytemp}/digest"
 
-last=`pwd`
-cd "${mytemp}"
-
-for f in *.digest; do
-	out=`diff -uNpr "${persist}/${f}" "${f}" 2>&1`
-	if [ $? != 0 ]; then
-		myreturn=1
-		wall <<__EOF__
+out=`diff -uNpr "${persist}/digest" "${mytemp}/digest" 2>&1`
+if [ $? == 0 ]; then
+	myreturn=0
+else
+	wall <<__EOF__
 Bad boot digest!!! (${f})
 ${out}
 __EOF__
-	fi
-done
-
-cd /
-rm -fr "${mytemp}"
-
-if [ "${boot_mounted}" = 0 ]; then
-	umount "${bootdir}"
 fi
+
+[ "${boot_mounted}" = 0 ] && umount "${bootdir}"
 
 exit ${myreturn}

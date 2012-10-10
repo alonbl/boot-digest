@@ -1,35 +1,16 @@
-#/bin/sh
-
-base=`dirname "$0"`
-cd "${base}"
-base=`pwd`
-digest=SHA1
-
-if [ -z "$1" ]; then
-	echo usage: $0 dest
-	exit 1
-fi
-
-dest="$1"
-cd "${dest}"
-dest=`pwd`;
-cd "${base}"
-mkdir "${dest}/more"
+#!/bin/sh
 
 part=`mount | grep boot | cut -f 1 -d ' '`
 disk=`echo "${part}" | sed 's/[0-9]*$//'`
 if [ -z "${disk}" ]; then
 	echo "Cannot determind boot disk" | wall
 else
-	dd "if=${disk}" "of=${dest}/more/mbr.sec" bs=512 count=1 > /dev/null 2>&1
-	dd "if=${part}" "of=${dest}/more/part.sec" bs=512 count=1 > /dev/null 2>&1
+	for u in md5sum sha512sum; do
+		echo "${disk}"
+		dd "if=${disk}" bs=512 count=1 status=noxfer 2> /dev/null | ${u}
+		echo "${part}"
+		dd "if=${part}" status=noxfer 2> /dev/null | ${u}
+	done
 fi
-
-cd "${dest}/more"
-"${base}/boot-digest-dir" "${digest}" . > "${dest}/more.digest"
-cd "${base}"
-"${base}/boot-digest-dir" "${digest}" /boot > "${dest}/boot.digest"
-
-rm -fr "${dest}/more"
 
 exit 0

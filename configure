@@ -5,7 +5,6 @@ cd `dirname "$0"`
 USAGE=0
 PREFIX=/usr
 LOCALSTATEDIR=/var/lib
-DIGEST=SHA1
 
 for p in $*; do
 	v=${p#*=}
@@ -37,6 +36,5 @@ fi
 
 echo "PREFIX=${PREFIX}" > Makefile.inc
 echo "LOCALSTATEDIR=${LOCALSTATEDIR}" >> Makefile.inc
-echo "DIGEST=${DIGEST}" >> Makefile.inc
 
 exit 0

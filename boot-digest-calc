@@ -1,10 +1,10 @@
 #!/bin/sh
 
-part=`mount | grep boot | cut -f 1 -d ' '`
-disk=`echo "${part}" | sed 's/[0-9]*$//'`
+disk=`cat /etc/fstab | grep /boot | sed 's/[ \t].*//'`
 if [ -z "${disk}" ]; then
 	echo "Cannot determind boot disk" | wall
 else
+	sync
 	for u in md5sum sha512sum; do
 		echo "${disk}"
 		dd "if=${disk}" bs=512 count=1 status=noxfer 2> /dev/null | ${u}

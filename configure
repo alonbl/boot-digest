@@ -25,16 +25,22 @@ for p in $*; do
 done
 
 if [ ${USAGE} != 0 ]; then
-	echo -e "usage $0"
-	echo -e "\t--help\t\t\tThis help."
-	echo -e "\t--prefix=dir\t\tSet installation prefix, default /usr."
-	echo -e "\t--localstatedir=dir\tSet state directory, default /var/lib."
-	echo -e "\t--digest=digest\t\tSet digest algorithm, default SHA1."
-	echo -e "\t\t\t\tThis digest is passed as argument to perl Digest->new."
+	cat << __EOF__
+Usage: %0 [args]
+usage $0
+--help          This help.
+--prefix=dir    Set installation prefix, default /usr.
+--localstatedir=dir
+                Set state directory, default /var/lib.
+--digest=digest Set digest algorithm, default SHA1.
+                This digest is passed as argument to perl Digest->new.
+__EOF__
 	exit 1
 fi
 
-echo "PREFIX=${PREFIX}" > Makefile.inc
-echo "LOCALSTATEDIR=${LOCALSTATEDIR}" >> Makefile.inc
+cat > Makefile.inc << __EOF__
+PREFIX=${PREFIX}
+LOCALSTATEDIR=${LOCALSTATEDIR}
+__EOF__
 
 exit 0

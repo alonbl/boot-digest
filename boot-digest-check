@@ -14,7 +14,7 @@ mkdir -p "${mytemp}"
 "${base}/boot-digest-calc" > "${mytemp}/digest"
 
 out=`diff -uNpr "${persist}/digest" "${mytemp}/digest" 2>&1`
-if [ $? == 0 ]; then
+if [ $? = 0 ]; then
 	myreturn=0
 else
 	wall <<__EOF__
